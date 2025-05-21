@@ -104,20 +104,4 @@ class ExpenseController extends Controller
         return $this->response('success', ['expense' => $expense], 200, 'Expense status updated');
     }
 
-    public function expenseList(Request $request, $event_id)
-    {
-        $event = Event::find($event_id);
-
-        if (!$event) {
-            return $this->response('error', [], 404, 'Event not found');
-        }
-
-        if (!$event->members->contains($request->user()->id)) {
-            return $this->response('error', [], 403, 'You are not a member of this event');
-        }
-
-        $expenses = Expense::where('event_id', $event_id)->get();
-
-        return $this->response('success', ['expenses' => $expenses], 200, 'Expenses retrieved successfully');
-    }
 }

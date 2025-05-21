@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Event;
+use App\Models\EventRequest;
+use App\Models\Expense;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +16,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        //User::factory()->count(50000)->create();
+        //Event::factory()->count(1000)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // EventRequest::factory()->count(10000)->create()->each(function ($eventRequest) {
+        //     if ($eventRequest->status === 'accepted') {
+        //         $eventRequest->event->members()->attach($eventRequest->user_id);
+        //     }
+        // });
+
+        Expense::factory()->count(10000)->create();
     }
 }

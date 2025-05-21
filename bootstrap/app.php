@@ -28,9 +28,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
 
+        $middleware->statefulApi();
+
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        
         $exceptions->render(function (NotFoundHttpException $e,) {
             return custom_response('fail', [], $e->getMessage(), 401);
         });

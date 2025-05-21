@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "scribe:watch": "chokidar 'app/**/*.php' 'routes/**/*.php' --ignoreInitial --quiet -c 'php artisan scribe:generate'"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0"
+  }
+}

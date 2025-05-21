@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
+/**
+ * @group Event
+ *
+ * APIs for managing resources
+ * 
+ * @subgroupDescription Do stuff with events
+ */
 class EventController extends Controller
 {
     public function index(Request $request)

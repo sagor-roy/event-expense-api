@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('v1')->group(function () {
-    Route::post('/login', [AuthController::class, 'login'])->middleware(['throttle:6,1']);
+    Route::post('/login', [AuthController::class, 'login']); //->middleware(['throttle:6,1']);
     Route::post('/register', [AuthController::class, 'register']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/expense/{event_id}', [ExpenseController::class, 'store']);
         Route::put('/expense/{expense_id}', [ExpenseController::class, 'update']);
         Route::put('/expense/{expense_id}/status', [ExpenseController::class, 'updateStatus']);
+        Route::get('/expense/list/{event_code}', [SummeryController::class, 'expenseList']);
         
     });
 });

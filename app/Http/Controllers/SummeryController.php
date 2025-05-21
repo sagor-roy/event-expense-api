@@ -66,9 +66,10 @@ class SummeryController extends Controller
         }
 
         $userId = $request->user()->id;
+        $isOwner = $event->owner_id === $userId;
         $isMember = $event->members->contains($userId);
 
-        if (!$isMember) {
+        if (!$isOwner && !$isMember) {
             return $this->response('error', null, 403, 'You are not authorized to access this event');
         }
 
@@ -80,5 +81,37 @@ class SummeryController extends Controller
             });;
 
         return $this->response('success', ['members' => $members], 200, 'Members retrieved successfully');
+    }
+
+    public function expenseList(Request $request, $event_code)
+    {
+        $event = Event::where('event_code', $event_code)->first();
+
+        if (!$event) {
+            return $this->response('error', null, 404, 'Event not found');
+        }
+
+        $userId = $request->user()->id;
+        $isOwner = $event->owner_id === $userId;
+        $isMember = $event->members->contains($userId);
+
+        if (!$isOwner && !$isMember) {
+            return $this->response('error', null, 403, 'You are not authorized to access this event');
+        }
+
+        $expenses = $event->expenses()->with('payer:id,name')
+            ->select('id', 'title', 'amount', 'paid_by', 'status')
+            ->get()
+            ->map(function ($expense) {
+                return [
+                    'id' => $expense->id,
+                    'title' => $expense->title,
+                    'amount' => round($expense->amount, 2),
+                    'paid_by' => $expense->payer->name,
+                    'status' => $expense->status,
+                ];
+            });
+
+        return $this->response('success', ['expenses' => $expenses], 200, 'Expenses retrieved successfully');
     }
 }
