@@ -39,7 +39,15 @@ class ExpenseController extends Controller
 
         $expense = Expense::create($data);
 
-        return $this->response('success', ['expense' => $expense], 200, 'Expense added successfully');
+        $responseExpense = [
+            'id' => $expense->id,
+            'title' => $expense->title,
+            'amount' => round($expense->amount, 2),
+            'paid_by' => $request->user()->name,
+            'status' => $expense->status,
+        ];
+
+        return $this->response('success', ['expense' => $responseExpense], 200, 'Expense added successfully');
     }
 
     public function update(Request $request, $expense_id)
@@ -68,7 +76,15 @@ class ExpenseController extends Controller
 
         $expense->update($data);
 
-        return $this->response('success', ['expense' => $expense], 200, 'Expense updated successfully');
+        $responseExpense = [
+            'id' => $expense->id,
+            'title' => $expense->title,
+            'amount' => round($expense->amount, 2),
+            'paid_by' => $request->user()->name,
+            'status' => $expense->status,
+        ];
+
+        return $this->response('success', ['expense' => $responseExpense], 200, 'Expense updated successfully');
     }
 
     public function updateStatus(Request $request, $expense_id)
@@ -101,7 +117,18 @@ class ExpenseController extends Controller
         $expense->status = $request->status;
         $expense->save();
 
-        return $this->response('success', ['expense' => $expense], 200, 'Expense status updated');
-    }
+        $responseExpense = [
+            'id' => $expense->id,
+            'title' => $expense->title,
+            'amount' => round($expense->amount, 2),
+            'paid_by' => $expense->payer->name, // Assuming 'payer' relation exists, or we fetch user. 
+            // Actually, 'payer' relation is used in 'expenseList' in SummeryController.
+            // Let's check Expense model if 'payer' exists or use 'user'.
+            // In SummeryController: $event->expenses()->with('payer:id,name')
+            // So 'payer' relation likely exists.
+            'status' => $expense->status,
+        ];
 
+        return $this->response('success', ['expense' => $responseExpense], 200, 'Expense status updated');
+    }
 }

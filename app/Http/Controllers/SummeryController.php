@@ -20,9 +20,10 @@ class SummeryController extends Controller
             ->get();
 
         $userId = $request->user()->id;
+        $isOwner = $event->owner_id === $userId;
         $isMember = $event->members->contains($userId);
 
-        if (!$isMember) {
+        if (!$isOwner && !$isMember) {
             return $this->response('error', null, 403, 'You are not authorized to access this event');
         }
 
@@ -47,7 +48,7 @@ class SummeryController extends Controller
                 'payable' => round($pay, 2),
                 'receivable' => round($receive, 2),
             ];
-        });
+        })->values();
 
         return $this->response('success', [
             'members_summary' => $member_summary,

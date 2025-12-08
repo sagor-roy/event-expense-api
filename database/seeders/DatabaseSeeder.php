@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //User::factory()->count(50000)->create();
+        User::factory()->count(50000)->create();
         //Event::factory()->count(1000)->create();
 
         // EventRequest::factory()->count(10000)->create()->each(function ($eventRequest) {
@@ -25,6 +25,6 @@ class DatabaseSeeder extends Seeder
         //     }
         // });
 
-        Expense::factory()->count(10000)->create();
+        //Expense::factory()->count(10000)->create();
     }
 }

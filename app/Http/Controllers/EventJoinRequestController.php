@@ -21,8 +21,19 @@ class EventJoinRequestController extends Controller
             return $this->response(false, [], 400, 'You are already a member of this event');
         }
 
-        if ($event->requests()->where('user_id', $user->id)->exists()) {
-            return $this->response(false, [], 400, 'You have already requested to join this event');
+        $existingRequest = $event->requests()->where('user_id', $user->id)->first();
+
+        if ($existingRequest) {
+            if ($existingRequest->status == 'pending') {
+                return $this->response(false, [], 400, 'You have already requested to join this event');
+            }
+            if ($existingRequest->status == 'accepted') {
+                return $this->response(false, [], 400, 'You are already a member of this event');
+            }
+            // If rejected, we allow re-request by updating the status to pending
+            $existingRequest->status = 'pending';
+            $existingRequest->save();
+            return $this->response(true, [], 201, 'Request to join event sent successfully');
         }
 
         $requestJoin = new EventRequest();
@@ -108,18 +119,18 @@ class EventJoinRequestController extends Controller
         }
 
         $joinRequests = EventRequest::where('event_id', $event->id)
-        ->with('event:id,name', 'user:id,name')
-        ->where('status', 'pending')
-        ->get()
-        ->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'user_name' => $item->user->name,
-                'event_name' => $item->event->name,
-                'status' => $item->status,
-                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
-            ];
-        });
+            ->with('event:id,name', 'user:id,name')
+            ->where('status', 'pending')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'user_name' => $item->user->name,
+                    'event_name' => $item->event->name,
+                    'status' => $item->status,
+                    'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
 
         return $this->response(true, ['requests' => $joinRequests], 200, 'Join requests retrieved successfully');
     }

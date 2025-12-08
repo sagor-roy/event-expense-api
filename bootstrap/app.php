@@ -64,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })->create();
     
 
-function custom_response($status, $data = [], $message = "", $code = 200): JsonResponse
-{
-    return response()->json(['message' => $message, 'status' => $status, 'data' => $data], $code);
-}
+// function custom_response($status, $data = [], $message = "", $code = 200): JsonResponse
+// {
+//     return response()->json(['message' => $message, 'status' => $status, 'data' => $data], $code);
+// }
