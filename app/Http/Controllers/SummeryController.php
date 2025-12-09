@@ -102,6 +102,7 @@ class SummeryController extends Controller
 
         $expenses = $event->expenses()->with('payer:id,name')
             ->select('id', 'title', 'amount', 'paid_by', 'status')
+            ->orderBy('id', 'desc')
             ->get()
             ->map(function ($expense) {
                 return [

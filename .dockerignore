@@ -1,0 +1,10 @@
+/vendor
+/node_modules
+/public/storage
+/.git
+/.idea
+/.vscode
+.env
+.phpunit.result.cache
+docker-compose.yml
+Dockerfile
