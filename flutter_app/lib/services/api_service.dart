@@ -11,7 +11,7 @@ class ApiService {
 
   ApiService._internal() {
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://127.0.0.1:8000/api/v1', // Adjust for emulator if needed (10.0.2.2 for Android)
+      baseUrl: 'https://expense-api.samapti.xyz/api/v1',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {
