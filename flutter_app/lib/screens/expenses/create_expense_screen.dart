@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/event.dart';
 import '../../providers/expense_provider.dart';
+import '../../widgets/app_title.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/form_card.dart';
+import '../../widgets/primary_button.dart';
 
 class CreateExpenseScreen extends StatefulWidget {
   final Event event;
@@ -53,44 +57,71 @@ class _CreateExpenseScreenState extends State<CreateExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Expense')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(labelText: 'Amount'),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Required';
-                  if (double.tryParse(value) == null) return 'Invalid number';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _noteController,
-                decoration: const InputDecoration(labelText: 'Note (Optional)'),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _submit,
-                      child: const Text('Add Expense'),
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        title: const Text('Add Expense'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            const AppTitle(
+              title: 'New Expense',
+              subtitle: 'Track your spending',
+            ),
+            const SizedBox(height: 32),
+            FormCard(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      controller: _titleController,
+                      label: 'Title',
+                      hint: 'Dinner, Taxi, etc.',
+                      prefixIcon: Icons.receipt_long_rounded,
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
                     ),
-            ],
-          ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _amountController,
+                      label: 'Amount',
+                      hint: '0.00',
+                      prefixIcon: Icons.attach_money_rounded,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Required';
+                        if (double.tryParse(value) == null)
+                          return 'Invalid number';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _noteController,
+                      label: 'Note',
+                      hint: 'Optional details...',
+                      prefixIcon: Icons.notes_rounded,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 32),
+                    PrimaryButton(
+                      text: 'Add Expense',
+                      onPressed: _submit,
+                      isLoading: _isLoading,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

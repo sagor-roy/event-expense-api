@@ -66,19 +66,37 @@ class EventProvider with ChangeNotifier {
     }
   }
 
+  List<JoinRequest> _joinRequests = [];
+  List<JoinRequest> get joinRequests => _joinRequests;
+
   // Helper for specific event data
-  Future<List<JoinRequest>> fetchJoinRequests(String eventCode) async {
-    return await _eventService.getJoinRequests(eventCode);
+  Future<void> fetchJoinRequests(String eventCode) async {
+    try {
+      _joinRequests = await _eventService.getJoinRequests(eventCode);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> acceptJoinRequest(String eventCode, int requestId) async {
-    await _eventService.acceptJoinRequest(eventCode, requestId);
-    notifyListeners(); // Maybe refresh something?
+    try {
+      await _eventService.acceptJoinRequest(eventCode, requestId);
+      _joinRequests.removeWhere((r) => r.id == requestId);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> rejectJoinRequest(String eventCode, int requestId) async {
-    await _eventService.rejectJoinRequest(eventCode, requestId);
-    notifyListeners();
+    try {
+      await _eventService.rejectJoinRequest(eventCode, requestId);
+      _joinRequests.removeWhere((r) => r.id == requestId);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<List<User>> fetchMembers(String eventCode) async {

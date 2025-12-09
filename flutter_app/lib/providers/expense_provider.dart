@@ -29,7 +29,7 @@ class ExpenseProvider with ChangeNotifier {
   Future<void> createExpense(int eventId, String title, double amount, String? note) async {
     try {
       final newExpense = await _expenseService.createExpense(eventId, title, amount, note);
-      _expenses.add(newExpense);
+      _expenses.insert(0, newExpense);
       notifyListeners();
     } catch (e) {
       rethrow;

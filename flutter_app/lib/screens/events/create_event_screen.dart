@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/event_provider.dart';
+import '../../widgets/app_title.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/form_card.dart';
+import '../../widgets/primary_button.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -54,39 +58,64 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Event')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Event Name'),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _codeController,
-                decoration: const InputDecoration(labelText: 'Event Code (Unique)'),
-                validator: (value) => value!.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descController,
-                decoration: const InputDecoration(labelText: 'Description (Optional)'),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _submit,
-                      child: const Text('Create Event'),
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        title: const Text('Create Event'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            const AppTitle(
+              title: 'New Event',
+              subtitle: 'Create a shared space for expenses',
+            ),
+            const SizedBox(height: 32),
+            FormCard(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      controller: _nameController,
+                      label: 'Event Name',
+                      hint: 'Summer Trip 2024',
+                      prefixIcon: Icons.event_note_rounded,
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
                     ),
-            ],
-          ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _codeController,
+                      label: 'Event Code',
+                      hint: 'SUMMER24',
+                      prefixIcon: Icons.tag_rounded,
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _descController,
+                      label: 'Description',
+                      hint: 'Optional description...',
+                      prefixIcon: Icons.description_outlined,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 32),
+                    PrimaryButton(
+                      text: 'Create Event',
+                      onPressed: _submit,
+                      isLoading: _isLoading,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

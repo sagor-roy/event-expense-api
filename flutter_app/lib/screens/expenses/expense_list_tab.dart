@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../models/event.dart';
 import '../../providers/expense_provider.dart';
 import 'create_expense_screen.dart';
+import '../../widgets/empty_state.dart';
+import '../../widgets/loading_indicator.dart';
 
 class ExpenseListTab extends StatefulWidget {
   final Event event;
@@ -27,47 +29,124 @@ class _ExpenseListTabState extends State<ExpenseListTab> {
     final isOwner = widget.event.owner == 'You';
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       body: expenseProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingIndicator(message: 'Loading expenses...')
           : expenseProvider.expenses.isEmpty
-              ? const Center(child: Text('No expenses yet.'))
+              ? EmptyState(
+                  message: 'No expenses yet. Add one!',
+                  icon: Icons.receipt_long_rounded,
+                  actionLabel: 'Add Expense',
+                  onAction: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CreateExpenseScreen(event: widget.event),
+                      ),
+                    );
+                  },
+                )
               : RefreshIndicator(
-                  onRefresh: () => expenseProvider.fetchExpenses(widget.event.eventCode),
-                  child: ListView.builder(
+                  onRefresh: () =>
+                      expenseProvider.fetchExpenses(widget.event.eventCode),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
                     itemCount: expenseProvider.expenses.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final expense = expenseProvider.expenses[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ListTile(
-                          title: Text(expense.title),
-                          subtitle: Column(
+                        elevation: 0,
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Paid by: ${expense.paidBy}'),
-                              const SizedBox(height: 4),
-                              _buildStatusBadge(expense.status),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('\$${expense.amount.toStringAsFixed(2)}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              if (isOwner && expense.status == 'pending') ...[
-                                IconButton(
-                                  icon: const Icon(Icons.check, color: Colors.green),
-                                  onPressed: () {
-                                    expenseProvider.updateExpenseStatus(expense.id, 'approved');
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  onPressed: () {
-                                    expenseProvider.updateExpenseStatus(expense.id, 'declined');
-                                  },
-                                ),
-                              ]
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          expense.title,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Paid by: ${expense.paidBy}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: Colors.grey.shade600,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${expense.amount.toStringAsFixed(2)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildStatusBadge(expense.status),
+                                  if (isOwner &&
+                                      expense.status == 'pending') ...[
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.check_circle,
+                                              color: Colors.green),
+                                          onPressed: () {
+                                            expenseProvider.updateExpenseStatus(
+                                                expense.id, 'approved');
+                                          },
+                                          tooltip: 'Approve',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.cancel,
+                                              color: Colors.red),
+                                          onPressed: () {
+                                            expenseProvider.updateExpenseStatus(
+                                                expense.id, 'declined');
+                                          },
+                                          tooltip: 'Decline',
+                                        ),
+                                      ],
+                                    )
+                                  ]
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -83,38 +162,50 @@ class _ExpenseListTabState extends State<ExpenseListTab> {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add_rounded),
       ),
     );
   }
 
   Widget _buildStatusBadge(String status) {
     Color color;
+    IconData icon;
     switch (status.toLowerCase()) {
       case 'approved':
         color = Colors.green;
+        icon = Icons.check_circle_outline_rounded;
         break;
       case 'declined':
         color = Colors.red;
+        icon = Icons.highlight_off_rounded;
         break;
       default:
         color = Colors.orange;
+        icon = Icons.pending_outlined;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.5)),
       ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            status.toUpperCase(),
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }
