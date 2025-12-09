@@ -7,7 +7,7 @@ fi
 
 domains=(expense-api.samapti.xyz)
 rsa_key_size=4096
-data_path="./certbot-etc"
+data_path="./certbot"
 email="admin@samapti.xyz" # Adding a valid email is safer
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
 
